@@ -1,7 +1,7 @@
 import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { sendPetActionToProducer } from "./petActionsProducer.js";
+import { sendPetActionToProducer } from "./producer.js";
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ app.use(cors());
 
 app.post("/", async (req: Request, res: Response) => {
     try {
-        const { id, name, action } = req.body;
+        const { id, action } = req.body;
         const producerResult = await sendPetActionToProducer(id, action);
         res.json(producerResult);
     } catch (error) {
@@ -26,7 +26,7 @@ app.post("/", async (req: Request, res: Response) => {
 });
 
 app.get("/", async (req: Request, res: Response) => {
-    console.log("yoyoyoyoyoyoyo yo!");
+    res.status(200).send("yoyoyoyoyoyo yo! yo yo ma :D");
 });
 
 const domain = process.env.SERVER_DOMAIN;

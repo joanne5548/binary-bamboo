@@ -1,9 +1,8 @@
 import { Kafka } from "kafkajs";
-import { type ActionType } from "../../types/interfaces.js";
 
 const kafka: Kafka = new Kafka({
     clientId: "client",
-    brokers: ["broker-1:29092", "broker-2:39092", "broker-3:49092"],
+    brokers: ["localhost:29092", "localhost:39092", "localhost:49092"],
 });
 
 const producer = kafka.producer();
@@ -11,10 +10,13 @@ producer.connect().catch(console.error);
 
 export const sendPetActionToProducer = async (
     id: string,
-    action: ActionType
+    action: string
 ) => {
+    // don't need error handling, let the post function handle it
     await producer.send({
         topic: "pet-actions",
         messages: [{ key: id, value: action }],
     });
+
+    return { success: true, action: action };
 };
