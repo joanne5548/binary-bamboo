@@ -1,7 +1,7 @@
 import { Kafka } from "kafkajs";
 
 const kafka: Kafka = new Kafka({
-    clientId: "client",
+    clientId: "pet-actions-producer",
     brokers: ["localhost:29092", "localhost:39092", "localhost:49092"],
 });
 

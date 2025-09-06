@@ -10,20 +10,30 @@ app.use(express.json());
 app.use(cors());
 
 app.post("/", async (req: Request, res: Response) => {
+    const { name } = req.params;
+    // TODO: handle adding a new panda to Redis. Also set up Redis
+});
+
+app.post("/:id", async (req: Request, res: Response) => {
     try {
-        const { id, action } = req.body;
+        const { id } = req.params as { id: string };
+
+        // check if key exists
+
+        const { action } = req.body;
         const producerResult = await sendPetActionToProducer(id, action);
         res.json(producerResult);
     } catch (error) {
         if (error instanceof Error) {
-            console.error("Kafka error:", error.message);
-            res.status(500).json({ error: "Kafka error: " + error.message });
+            console.error("Server error:", error.message);
+            res.status(500).json({ error: "Server error: " + error.message });
         } else {
             console.error("Unexpected error:", error);
             res.status(500).json({ error: "Unexpected error occured" });
         }
     }
 });
+
 
 app.get("/", async (req: Request, res: Response) => {
     res.status(200).send("yoyoyoyoyoyo yo! yo yo ma :D");
