@@ -1,7 +1,9 @@
 import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { sendPetActionToProducer } from "./producer.js";
+import { setNewPet, petNameExists } from "@internal/redis";
+import { v4 as uuidv4 } from "uuid";
+// import { sendPetActionToProducer } from "./producer.js";
 
 dotenv.config();
 
@@ -10,33 +12,54 @@ app.use(express.json());
 app.use(cors());
 
 app.post("/", async (req: Request, res: Response) => {
-    const { name } = req.params;
-    // TODO: handle adding a new panda to Redis. Also set up Redis
-});
-
-app.post("/:id", async (req: Request, res: Response) => {
     try {
-        const { id } = req.params as { id: string };
+        const { name } = req.body;
 
-        // check if key exists
+        const exists = await petNameExists(name);
+        if (exists) {
+            res.status(400).json({ error: `Pet name ${name} already exists.`});
+            return
+        }
 
-        const { action } = req.body;
-        const producerResult = await sendPetActionToProducer(id, action);
-        res.json(producerResult);
-    } catch (error) {
+        const id: string = uuidv4();
+        await setNewPet(id, name as string);
+
+        res.status(201).json({ id: id, name: name });
+    }
+    catch (error) {
         if (error instanceof Error) {
-            console.error("Server error:", error.message);
-            res.status(500).json({ error: "Server error: " + error.message });
-        } else {
-            console.error("Unexpected error:", error);
-            res.status(500).json({ error: "Unexpected error occured" });
+            console.error(`Server 1 error (API): ${error.message}`);
+            res.status(500).json({ error: `Server 1 error (API): ${error.message}` });
+        }
+        else {
+            console.log(`Unexpected error: ${error}`);
+            res.status(500).json({ error: `Unexpected error: ${error}` });
         }
     }
 });
 
+// app.post("/:id", async (req: Request, res: Response) => {
+//     try {
+//         const { id } = req.params as { id: string };
+
+//         // check if key exists
+
+//         const { action } = req.body;
+//         const producerResult = await sendPetActionToProducer(id, action);
+//         res.json(producerResult);
+//     } catch (error) {
+//         if (error instanceof Error) {
+//             console.error("Server error:", error.message);
+//             res.status(500).json({ error: "Server error: " + error.message });
+//         } else {
+//             console.error("Unexpected error:", error);
+//             res.status(500).json({ error: "Unexpected error occured" });
+//         }
+//     }
+// });
 
 app.get("/", async (req: Request, res: Response) => {
-    res.status(200).send("yoyoyoyoyoyo yo! yo yo ma :D");
+    res.status(200).send("da server is up and running :D");
 });
 
 const domain = process.env.SERVER_DOMAIN;
