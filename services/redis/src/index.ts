@@ -2,7 +2,7 @@ import { createClient, type RedisClientType } from "redis";
 
 let client: RedisClientType | null = null;
 
-const getRedisClient = async () => {
+const getClient = async () => {
     if (client) {
         return client;
     }
@@ -14,7 +14,7 @@ const getRedisClient = async () => {
 };
 
 export const setNewPet = async (petId: string, petName: string) => {
-    const redisClient = await getRedisClient();
+    const redisClient = await getClient();
 
     await redisClient.set(`pet:name:${petName}`, petId);
     await redisClient.json.set(`pet:id:${petId}`, "$", {
@@ -28,9 +28,15 @@ export const setNewPet = async (petId: string, petName: string) => {
 };
 
 export const petNameExists = async (petName: string) => {
-    const redisClient = await getRedisClient();
-    const val = await redisClient.get(`pet:name:${petName}`);
-    return val !== null;
+    const redisClient = await getClient();
+    const petId = await redisClient.get(`pet:name:${petName}`);
+    return petId !== null;
+}
+
+export const petIdExists = async (petId: string) => {
+    const redisClient = await getClient();
+    const petInfo = await redisClient.get(`pet:id:${petId}`);
+    return petInfo !== null;
 }
 
 // sanity check
