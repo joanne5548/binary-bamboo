@@ -1,42 +1,44 @@
-import { Kafka, type Consumer, type Producer } from 'kafkajs';
+import { runConsumer } from "@internal/kafka";
+import { petIdExists } from "@internal/redis";
 
-const kafka: Kafka = new Kafka({
-    clientId: "event-processor",
-    brokers: ["localhost:29092", "localhost:39092", "localhost:49092"]
-});
+const onPetEventConsume = async (petId: string, message: string) => {
+    const exists = petIdExists(petId);
+    if (!exists) {
+        throw new Error("Pet ID does not exist in the database.");
+    }
 
-const consumer: Consumer = kafka.consumer({ groupId: "actions-consumer" });
-// const producer: Producer = kafka.producer();
+    switch (message) {
+        case "feed":
+            console.log("you fed your pet!");
+            break
+        case "play":
+            console.log("you played with your pet!");
+            break
+        case "sleep":
+            console.log("your pet took a nap!");
+            break
+        default:
+            throw new Error(`Invalid pet event: ${message}`);
+    }
+}
 
-// TODO: add better startup error handling for connect & subscribe
-consumer.connect().catch(console.error);
-consumer.subscribe({ topic: "pet-actions", fromBeginning: true}).catch(console.error);
-
-// producer.connect().catch(console.error);
-
-consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-        // console.log({
-        //     key: message.key.toString(),
-        //     value: message.value.toString(),
-        //     headers: message.headers,
-        // })
-
-        // if key exists, proceed
-        
-        switch (message.value.toString()) {
-            case "feed":
-                // do feed operation
-                console.log("you feeded the panda!");
-                break
-            case "play":
-                // play operation
-                break
-            case "sleep":
-                // sleep operation
-                break
-            default:
-                // do nothing?
+const startEventProcessor = async () => {
+    try {
+        await runConsumer(onPetEventConsume);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            console.log(`Server 2 Error: ${error.message}`);
+        }
+        else {
+            console.log(`Server 2 Unknown error: ${error}`);
         }
     }
+}
+
+process.on("SIGINT", async () => {
+    console.log("Shutting down server 2...");
+    // Implement shutdown logic for kafka and redis client
 });
+
+startEventProcessor();
