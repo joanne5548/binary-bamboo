@@ -35,7 +35,7 @@ export const petNameExists = async (petName: string) => {
 
 export const petIdExists = async (petId: string) => {
     const redisClient = await getClient();
-    const petInfo = await redisClient.get(`pet:id:${petId}`);
+    const petInfo = await redisClient.json.get(`pet:id:${petId}`, { path: "$" });
     return petInfo !== null;
 }
 

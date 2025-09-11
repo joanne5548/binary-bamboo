@@ -18,7 +18,8 @@ const onPetEventConsume = async (petId: string, message: string) => {
             console.log("your pet took a nap!");
             break
         default:
-            throw new Error(`Invalid pet event: ${message}`);
+            // throw new Error(`Invalid pet event: ${message}`);
+            console.log(`Unknown pet event: ${message}`);
     }
 }
 
@@ -39,6 +40,7 @@ const startEventProcessor = async () => {
 process.on("SIGINT", async () => {
     console.log("Shutting down server 2...");
     // Implement shutdown logic for kafka and redis client
+    process.exit(0);
 });
 
 startEventProcessor();

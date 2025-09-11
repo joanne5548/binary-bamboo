@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { setNewPet, petNameExists, petIdExists } from "@internal/redis";
 import { v4 as uuidv4 } from "uuid";
-import { sendPetActionToProducer } from "@internal/kafka";
+import { sendPetEventToPetEventsTopic } from "@internal/kafka";
 
 dotenv.config();
 
@@ -44,10 +44,8 @@ app.post("/:id", async (req: Request, res: Response) => {
         if (!exists) {
             throw new Error("Pet ID does not exist.");
         }
-
         const { event } = req.body;
-        const producerResult = await sendPetActionToProducer(id, event);
-        console.log(producerResult);
+        const producerResult = await sendPetEventToPetEventsTopic(id, event);
         res.status(200).json({
             id: id,
             event: event,

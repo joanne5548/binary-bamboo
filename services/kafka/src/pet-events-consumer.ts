@@ -9,12 +9,12 @@ const getConsumer = async () => {
     }
 
     client = new Kafka({
-        clientId: "event-processor",
+        clientId: "pet-events-consumer",
         brokers: ["localhost:29092", "localhost:39092", "localhost:49092"]
     });
     consumer = client.consumer({ groupId: "events-consumer" });
     await consumer.connect();
-    await consumer.subscribe({ topic: "pet-events", fromBeginning: true});
+    await consumer.subscribe({ topic: "pet-events", fromBeginning: false});
     return consumer;
 }
 
