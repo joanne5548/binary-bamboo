@@ -13,18 +13,32 @@ const getClient = async () => {
     return client;
 };
 
+// TODO: Set this globally
+type PetState = {
+    hungry: number,
+    happy: number,
+    sleepy: number,
+};
+
+type PetInfo = {
+    petName: string,
+    petState: PetState,
+};
+
 export const setNewPet = async (petId: string, petName: string) => {
     const redisClient = await getClient();
 
     await redisClient.set(`pet:name:${petName}`, petId);
-    await redisClient.json.set(`pet:id:${petId}`, "$", {
+
+    const defaultPetInfo: PetInfo = {
         petName: petName,
         petState: {
             hungry: 50,
             happy: 50,
-            tired: 50,
-        },
-    });
+            sleepy: 50
+        }
+    }
+    await redisClient.json.set(`pet:id:${petId}`, "$", defaultPetInfo);
 };
 
 /**
@@ -48,7 +62,8 @@ export const getPetInfo = async (petId: string) => {
     const petInfo = await redisClient.json.get(`pet:id:${petId}`, {
         path: "$",
     });
-    return petInfo;
+    console.log(petInfo[0]);
+    return petInfo[0] as PetInfo; // how to type check properly?
 };
 
 // sanity check

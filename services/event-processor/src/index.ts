@@ -6,42 +6,44 @@ import {
 } from "@internal/kafka";
 import { getPetInfo } from "@internal/redis";
 
-// TODO: Set this globally
+// TODO: Set this globally; resolve import conflict
 type PetState = {
-    hungry: number;
-    happy: number;
-    sleepy: number;
+    hungry: number,
+    happy: number,
+    sleepy: number,
 };
 
 type PetInfo = {
-    petName: string;
-    petState: PetState;
+    petName: string,
+    petState: PetState,
 };
 
 const eventToNewPetState = async (petId: string, petState: PetState, event: string) => {
+    // console.log(`Current State | hungry: ${petState.hungry} | happy: ${petState.happy} | sleep: ${petState.sleepy}`);
     switch (event) {
+        // TODO: make these into a function so it looks less ugly
         case "feed":
             console.log("you fed your pet!");
-            petState['hungry'] = petState['hungry'] > 15 ? petState['hungry'] - 15 : 0;
-            petState['happy'] = petState['happy'] < 90 ? petState['happy'] + 10 : 100;
-            petState['sleepy'] = petState['sleepy'] < 95 ? petState['sleepy'] + 5 : 100;
+            petState.hungry = petState.hungry > 15 ? petState.hungry - 15 : 0;
+            petState.happy = petState.happy < 90 ? petState.happy + 10 : 100;
+            petState.sleepy = petState.sleepy < 95 ? petState.sleepy + 5 : 100;
             break;
         case "play":
             console.log("you played with your pet!");
-            petState['hungry'] = petState['hungry'] < 80 ? petState['hungry'] + 20 : 100;
-            petState['happy'] = petState['happy'] < 80 ? petState['happy'] + 20 : 100;
-            petState['sleepy'] = petState['sleepy'] < 85 ? petState['sleepy'] + 15 : 100;
+            petState.hungry = petState.hungry < 80 ? petState.hungry + 20 : 100;
+            petState.happy = petState.happy < 80 ? petState.happy + 20 : 100;
+            petState.sleepy = petState.sleepy < 85 ? petState.sleepy + 15 : 100;
             break;
         case "sleep":
             console.log("your pet took a nap!");
-            petState['hungry'] = petState['hungry'] < 70 ? petState['hungry'] + 30 : 100;
-            petState['happy'] = petState['happy'] < 90 ? petState['happy'] + 10 : 100;
-            petState['sleepy'] = petState['sleepy'] > 30 ? petState['sleepy'] - 30 : 0;
+            petState.hungry = petState.hungry < 70 ? petState.hungry + 30 : 100;
+            petState.happy = petState.happy < 90 ? petState.happy + 10 : 100;
+            petState.sleepy = petState.sleepy > 30 ? petState.sleepy - 30 : 0;
             break;
         default:
             throw new Error(`Kafka: Invalid pet event to be sent to pet-state-changes: ${event}`);
     }
-    console.log(`New state: ${petState}`);
+    // console.log(`New State | hungry: ${petState.hungry} | happy: ${petState.happy} | sleep: ${petState.sleepy}`);
     const { topicName, partition } = await produceToPetStateChangesTopic(petId, petState);
     return { 
         petId: petId,
@@ -61,7 +63,7 @@ const onPetEventConsume = async (petId: string, message: string) => {
         console.log(`Unknown pet event: ${message}`);
         return;
     }
-    const result = await eventToNewPetState(petId, petInfo['petState'], message);
+    const result = await eventToNewPetState(petId, petInfo.petState, message);
     console.log(result); // what 2 to with result?
 };
 

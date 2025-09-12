@@ -49,7 +49,7 @@ export const produceToPetStateChangesTopic = async (petId: string, newPetState: 
         topic: "pet-state-changes",
         messages: [{ 
             key: petId,
-            value: newPetState
+            value: JSON.stringify(newPetState) // remember, kafka only accepts string values!
         }]
     });
 
