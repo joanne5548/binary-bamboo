@@ -1,9 +1,9 @@
 import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { setNewPet, petNameExists, petIdExists } from "@internal/redis";
 import { v4 as uuidv4 } from "uuid";
-import { sendPetEventToPetEventsTopic } from "@internal/kafka";
+import { setNewPet, getPetId, getPetInfo } from "@internal/redis";
+import { produceToPetEventsTopic } from "@internal/kafka";
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ app.use(cors());
 app.post("/", async (req: Request, res: Response) => {
     try {
         const { name } = req.body;
-        const exists = await petNameExists(name);
+        const exists = await getPetId(name);
         if (exists) {
             res.status(400).json({ error: `Pet name ${name} already exists.` });
             return;
@@ -40,17 +40,17 @@ app.post("/:id", async (req: Request, res: Response) => {
     try {
         const { id } = req.params as { id: string };
 
-        const exists = await petIdExists(id);
-        if (!exists) {
+        const petInfo = await getPetInfo(id);
+        if (!petInfo) {
             throw new Error("Pet ID does not exist.");
         }
         const { event } = req.body;
-        const producerResult = await sendPetEventToPetEventsTopic(id, event);
+        const { topicName, partition } = await produceToPetEventsTopic(id, event);
         res.status(200).json({
             id: id,
             event: event,
-            topic: producerResult.topicName,
-            partition: producerResult.partition,
+            topic: topicName,
+            partition: partition,
         });
     } catch (error) {
         if (error instanceof Error) {

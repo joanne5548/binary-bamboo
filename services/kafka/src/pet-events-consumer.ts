@@ -24,3 +24,10 @@ export const runConsumer = async (messageCallback: (petId: string, message: stri
         eachMessage: async ({ message }) => messageCallback(message.key, message.value.toString())
     });
 }
+
+export const shutdownConsumer = async () => {
+    if (!consumer) {
+        return;
+    }
+    await consumer.disconnect();
+}

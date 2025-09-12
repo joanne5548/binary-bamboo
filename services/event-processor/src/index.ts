@@ -1,45 +1,87 @@
-import { runConsumer } from "@internal/kafka";
-import { petIdExists } from "@internal/redis";
+import {
+    produceToPetStateChangesTopic,
+    runConsumer,
+    shutdownConsumer,
+    shutdownProducer,
+} from "@internal/kafka";
+import { getPetInfo } from "@internal/redis";
+
+// TODO: Set this globally
+type PetState = {
+    hungry: number;
+    happy: number;
+    sleepy: number;
+};
+
+type PetInfo = {
+    petName: string;
+    petState: PetState;
+};
+
+const eventToNewPetState = async (petId: string, petState: PetState, event: string) => {
+    switch (event) {
+        case "feed":
+            console.log("you fed your pet!");
+            petState['hungry'] = petState['hungry'] > 15 ? petState['hungry'] - 15 : 0;
+            petState['happy'] = petState['happy'] < 90 ? petState['happy'] + 10 : 100;
+            petState['sleepy'] = petState['sleepy'] < 95 ? petState['sleepy'] + 5 : 100;
+            break;
+        case "play":
+            console.log("you played with your pet!");
+            petState['hungry'] = petState['hungry'] < 80 ? petState['hungry'] + 20 : 100;
+            petState['happy'] = petState['happy'] < 80 ? petState['happy'] + 20 : 100;
+            petState['sleepy'] = petState['sleepy'] < 85 ? petState['sleepy'] + 15 : 100;
+            break;
+        case "sleep":
+            console.log("your pet took a nap!");
+            petState['hungry'] = petState['hungry'] < 70 ? petState['hungry'] + 30 : 100;
+            petState['happy'] = petState['happy'] < 90 ? petState['happy'] + 10 : 100;
+            petState['sleepy'] = petState['sleepy'] > 30 ? petState['sleepy'] - 30 : 0;
+            break;
+        default:
+            throw new Error(`Kafka: Invalid pet event to be sent to pet-state-changes: ${event}`);
+    }
+    console.log(`New state: ${petState}`);
+    const { topicName, partition } = await produceToPetStateChangesTopic(petId, petState);
+    return { 
+        petId: petId,
+        newPetState: petState,
+        topicName: topicName,
+        partition: partition
+    };
+};
 
 const onPetEventConsume = async (petId: string, message: string) => {
-    const exists = petIdExists(petId);
-    if (!exists) {
+    const petInfo: PetInfo = await getPetInfo(petId);
+    if (!petInfo) {
         throw new Error("Pet ID does not exist in the database.");
     }
 
-    switch (message) {
-        case "feed":
-            console.log("you fed your pet!");
-            break
-        case "play":
-            console.log("you played with your pet!");
-            break
-        case "sleep":
-            console.log("your pet took a nap!");
-            break
-        default:
-            // throw new Error(`Invalid pet event: ${message}`);
-            console.log(`Unknown pet event: ${message}`);
+    if (message !== "feed" && message !== "play" && message !== "sleep") {
+        console.log(`Unknown pet event: ${message}`);
+        return;
     }
-}
+    const result = await eventToNewPetState(petId, petInfo['petState'], message);
+    console.log(result); // what 2 to with result?
+};
 
 const startEventProcessor = async () => {
     try {
         await runConsumer(onPetEventConsume);
-    }
-    catch (error) {
+    } catch (error) {
         if (error instanceof Error) {
             console.log(`Server 2 Error: ${error.message}`);
-        }
-        else {
+        } else {
             console.log(`Server 2 Unknown error: ${error}`);
         }
     }
-}
+};
 
 process.on("SIGINT", async () => {
     console.log("Shutting down server 2...");
-    // Implement shutdown logic for kafka and redis client
+    // Todo: Test these
+    await shutdownProducer();
+    await shutdownConsumer();
     process.exit(0);
 });
 

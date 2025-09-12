@@ -18,26 +18,38 @@ export const setNewPet = async (petId: string, petName: string) => {
 
     await redisClient.set(`pet:name:${petName}`, petId);
     await redisClient.json.set(`pet:id:${petId}`, "$", {
-        "petName": petName,
-        "petState": {
+        petName: petName,
+        petState: {
             hungry: 50,
             happy: 50,
-            tired: 50
-        }
+            tired: 50,
+        },
     });
 };
 
-export const petNameExists = async (petName: string) => {
+/**
+ * 
+ * @param petName 
+ * @returns Corresponding pet ID. Null if not
+ */
+export const getPetId = async (petName: string) => {
     const redisClient = await getClient();
     const petId = await redisClient.get(`pet:name:${petName}`);
-    return petId !== null;
-}
+    return petId;
+};
 
-export const petIdExists = async (petId: string) => {
+/**
+ *
+ * @param petId
+ * @returns Pet state if pet ID exists. Null if not
+ */
+export const getPetInfo = async (petId: string) => {
     const redisClient = await getClient();
-    const petInfo = await redisClient.json.get(`pet:id:${petId}`, { path: "$" });
-    return petInfo !== null;
-}
+    const petInfo = await redisClient.json.get(`pet:id:${petId}`, {
+        path: "$",
+    });
+    return petInfo;
+};
 
 // sanity check
 console.log("Redis module compiled!");
