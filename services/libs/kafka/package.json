@@ -1,5 +1,5 @@
 {
-  "name": "@internal/kafka",
+  "name": "kafka",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/kafka/src/index.js"
   },
   "dependencies": {
     "kafkajs": "^2.2.4"
