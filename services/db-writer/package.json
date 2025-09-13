@@ -1,17 +1,19 @@
 {
-  "name": "@internal/kafka",
+  "name": "db-writer",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "module",
-  "main": "dist/kafka/src/index.js",
+  "type": "commonjs",
+  "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "kafkajs": "^2.2.4"
+    "@internal/kafka": "file:../libs/kafka",
+    "@internal/redis": "file:../libs/redis",
+    "@types/node": "^24.3.3"
   }
 }

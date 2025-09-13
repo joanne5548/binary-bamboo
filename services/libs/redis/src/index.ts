@@ -52,7 +52,7 @@ export const getPetInfo = async (petId: string) => {
         path: "$",
     });
     console.log(petInfo[0]);
-    return petInfo[0] as PetInfo; // how to type check properly?
+    return petInfo[0] as PetInfo; // TODO: use Zod for data validation
 };
 
 // sanity check

@@ -18,14 +18,14 @@ const getConsumer = async () => {
     return consumer;
 }
 
-export const runConsumer = async (messageCallback: (petId: string, message: string) => Promise<void>) => {
+export const runPetEventsConsumer = async (messageCallback: (petId: string, message: string) => Promise<void>) => {
     const kafkaConsumer = await getConsumer();
     await kafkaConsumer.run({
         eachMessage: async ({ message }) => messageCallback(message.key, message.value.toString())
     });
 }
 
-export const shutdownConsumer = async () => {
+export const shutdownPetEventsConsumer = async () => {
     if (!consumer) {
         return;
     }

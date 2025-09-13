@@ -1,7 +1,7 @@
 import {
     produceToPetStateChangesTopic,
-    runConsumer,
-    shutdownConsumer,
+    runPetEventsConsumer,
+    shutdownPetEventsConsumer,
     shutdownProducer,
 } from "@internal/kafka";
 import { getPetInfo } from "@internal/redis";
@@ -57,7 +57,7 @@ const onPetEventConsume = async (petId: string, message: string) => {
 
 const startEventProcessor = async () => {
     try {
-        await runConsumer(onPetEventConsume);
+        await runPetEventsConsumer(onPetEventConsume);
     } catch (error) {
         if (error instanceof Error) {
             console.log(`Server 2 Error: ${error.message}`);
@@ -71,7 +71,7 @@ process.on("SIGINT", async () => {
     console.log("Shutting down server 2...");
     // Todo: Test these
     await shutdownProducer();
-    await shutdownConsumer();
+    await shutdownPetEventsConsumer();
     process.exit(0);
 });
 
