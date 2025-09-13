@@ -12,8 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@internal/kafka": "file:../kafka",
-    "@internal/redis": "file:../redis",
+    "@internal/kafka": "file:../libs/kafka",
+    "@internal/redis": "file:../libs/redis",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   },

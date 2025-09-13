@@ -1,4 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
+import { type PetInfo } from "@internal/types/types.js"
 
 let client: RedisClientType | null = null;
 
@@ -11,18 +12,6 @@ const getClient = async () => {
     await client.connect();
     console.log("Redis client connected.");
     return client;
-};
-
-// TODO: Set this globally
-type PetState = {
-    hungry: number,
-    happy: number,
-    sleepy: number,
-};
-
-type PetInfo = {
-    petName: string,
-    petState: PetState,
 };
 
 export const setNewPet = async (petId: string, petName: string) => {
@@ -38,7 +27,7 @@ export const setNewPet = async (petId: string, petName: string) => {
             sleepy: 50
         }
     }
-    await redisClient.json.set(`pet:id:${petId}`, "$", defaultPetInfo);
+    await redisClient.json.set(`pet:id:${petId}`, "$", JSON.stringify(defaultPetInfo));
 };
 
 /**

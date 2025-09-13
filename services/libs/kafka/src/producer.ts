@@ -1,4 +1,5 @@
 import { Kafka, type Producer, type RecordMetadata } from "kafkajs";
+import { type PetState } from "@internal/types/types.js"
 
 let client: Kafka | null = null;
 let producer: Producer | null = null;
@@ -35,12 +36,6 @@ export const produceToPetEventsTopic = async (id: string, event: string) => {
 
     return { topicName: result[0].topicName, partition: result[0].partition };
 };
-
-type PetState = {
-    hungry: number,
-    happy: number,
-    sleepy: number
-}
 
 export const produceToPetStateChangesTopic = async (petId: string, newPetState: PetState) => {
     const kafkaProducer = await getProducer();

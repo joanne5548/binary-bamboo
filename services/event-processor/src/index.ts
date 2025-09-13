@@ -5,18 +5,7 @@ import {
     shutdownProducer,
 } from "@internal/kafka";
 import { getPetInfo } from "@internal/redis";
-
-// TODO: Set this globally; resolve import conflict
-type PetState = {
-    hungry: number,
-    happy: number,
-    sleepy: number,
-};
-
-type PetInfo = {
-    petName: string,
-    petState: PetState,
-};
+import { type PetState, type PetInfo } from "@internal/types/types.js";
 
 const eventToNewPetState = async (petId: string, petState: PetState, event: string) => {
     // console.log(`Current State | hungry: ${petState.hungry} | happy: ${petState.happy} | sleep: ${petState.sleepy}`);

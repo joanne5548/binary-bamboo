@@ -3,6 +3,10 @@
   "compilerOptions": {
     // File Layout
     "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@internal/types/*": ["../types/*"]
+    },
 
     // Environment Settings
     "module": "nodenext",
