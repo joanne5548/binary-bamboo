@@ -1,5 +1,5 @@
 import { Kafka, type Producer, type RecordMetadata } from "kafkajs";
-import { type PetState } from "@internal/types/types.js"
+import { type PetState } from "@internal/interfaces/interfaces.js"
 
 let client: Kafka | null = null;
 let producer: Producer | null = null;

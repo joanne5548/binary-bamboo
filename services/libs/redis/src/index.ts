@@ -1,5 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
-import { type PetInfo } from "@internal/types/types.js"
+import { type PetInfo } from "@internal/interfaces/interfaces.js"
 
 let client: RedisClientType | null = null;
 

@@ -5,12 +5,11 @@ import {
     shutdownProducer,
 } from "@internal/kafka";
 import { getPetInfo } from "@internal/redis";
-import { type PetState, type PetInfo } from "@internal/types/types.js";
+import { type PetState, type PetInfo } from "@internal/interfaces/interfaces.js";
 
 const eventToNewPetState = async (petId: string, petState: PetState, event: string) => {
     // console.log(`Current State | hungry: ${petState.hungry} | happy: ${petState.happy} | sleep: ${petState.sleepy}`);
     switch (event) {
-        // TODO: make these into a function so it looks less ugly
         case "feed":
             console.log("you fed your pet!");
             petState.hungry = petState.hungry > 15 ? petState.hungry - 15 : 0;

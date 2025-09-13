@@ -6,7 +6,7 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@internal/types/*": ["../libs/types/*"]
+      "@internal/interfaces/*": ["../libs/interfaces/*"]
     },
 
     // Environment Settings
