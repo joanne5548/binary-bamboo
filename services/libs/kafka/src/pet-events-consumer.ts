@@ -21,7 +21,7 @@ const getConsumer = async () => {
 export const runPetEventsConsumer = async (messageCallback: (petId: string, message: string) => Promise<void>) => {
     const kafkaConsumer = await getConsumer();
     await kafkaConsumer.run({
-        eachMessage: async ({ message }) => messageCallback(message.key, message.value.toString())
+        eachMessage: async ({ message }) => messageCallback(message.key.toString(), message.value.toString())
     });
 }
 

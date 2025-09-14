@@ -1,8 +1,9 @@
 import { runPetStateChangesConsumer } from "@internal/kafka"
-import { type PetState } from "@internal/interfaces/interfaces"
+import { updatePetInfo } from "@internal/redis"
+import { type PetInfo } from "@internal/interfaces/interfaces.js"
 
-const onPetStateChangesConsume = async (petId: string, newState: PetState) => {
-    // TODO: Fill in logic
+const onPetStateChangesConsume = async (petId: string, newPetInfo: PetInfo) => {
+    await updatePetInfo(petId, newPetInfo);
 }
 
 const runDBWriter = async () => {

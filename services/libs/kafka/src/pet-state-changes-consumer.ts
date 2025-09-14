@@ -1,5 +1,5 @@
 import { Kafka, type Consumer } from "kafkajs";
-import { type PetState } from "@internal/interfaces/interfaces.js";
+import { type PetInfo } from "@internal/interfaces/interfaces.js";
 
 let client: Kafka | null = null;
 let consumer: Consumer | null = null;
@@ -23,12 +23,16 @@ const getConsumer = async () => {
 };
 
 export const runPetStateChangesConsumer = async (
-    messageCallback: (petId: string, newState: PetState) => Promise<void>
+    messageCallback: (petId: string, newPetInfo: PetInfo) => Promise<void>
 ) => {
     const kafkaConsumer = await getConsumer();
     await kafkaConsumer.run({
-        eachMessage: async ({ message }) =>
-            messageCallback(message.key, message.value), // Zod data validation for message value?
+        eachMessage: async ({ message }) => {
+            const petId = message.key.toString();
+            // parse message.value since the JSON is serialized
+            const newPetInfo: PetInfo = JSON.parse(message.value.toString()); // Zod data validation for message value?
+            messageCallback(petId, newPetInfo);
+        }
     });
 };
 

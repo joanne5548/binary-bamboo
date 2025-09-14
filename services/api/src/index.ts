@@ -2,7 +2,7 @@ import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
-import { setNewPet, getPetId, getPetInfo } from "@internal/redis";
+import { createNewPet, getPetId, getPetInfo } from "@internal/redis";
 import { produceToPetEventsTopic } from "@internal/kafka";
 
 dotenv.config();
@@ -19,9 +19,10 @@ app.post("/", async (req: Request, res: Response) => {
             res.status(400).json({ error: `Pet name ${name} already exists.` });
             return;
         }
-
         const id: string = uuidv4();
-        await setNewPet(id, name as string);
+
+        await createNewPet(id, name as string);
+        
         res.status(201).json({ id: id, name: name });
     } catch (error) {
         if (error instanceof Error) {
@@ -39,13 +40,14 @@ app.post("/", async (req: Request, res: Response) => {
 app.post("/:id", async (req: Request, res: Response) => {
     try {
         const { id } = req.params as { id: string };
-
         const petInfo = await getPetInfo(id);
         if (!petInfo) {
             throw new Error("Pet ID does not exist.");
         }
         const { event } = req.body;
+
         const { topicName, partition } = await produceToPetEventsTopic(id, event);
+
         res.status(200).json({
             id: id,
             event: event,

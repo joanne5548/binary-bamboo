@@ -5,10 +5,10 @@ import {
     shutdownProducer,
 } from "@internal/kafka";
 import { getPetInfo } from "@internal/redis";
-import { type PetState, type PetInfo } from "@internal/interfaces/interfaces.js";
+import { type PetInfo } from "@internal/interfaces/interfaces.js";
 
-const eventToNewPetState = async (petId: string, petState: PetState, event: string) => {
-    // console.log(`Current State | hungry: ${petState.hungry} | happy: ${petState.happy} | sleep: ${petState.sleepy}`);
+const eventToNewPetState = async (petId: string, petInfo: PetInfo, event: string) => {
+    let petState = petInfo.petState;
     switch (event) {
         case "feed":
             console.log("you fed your pet!");
@@ -25,20 +25,14 @@ const eventToNewPetState = async (petId: string, petState: PetState, event: stri
         case "sleep":
             console.log("your pet took a nap!");
             petState.hungry = petState.hungry < 70 ? petState.hungry + 30 : 100;
-            petState.happy = petState.happy < 90 ? petState.happy + 10 : 100;
+            petState.happy = petState.happy > 10 ? petState.happy - 10 : 0;
             petState.sleepy = petState.sleepy > 30 ? petState.sleepy - 30 : 0;
             break;
         default:
-            throw new Error(`Kafka: Invalid pet event to be sent to pet-state-changes: ${event}`);
+            throw new Error(`Invalid pet event sent to pet-state-changes: ${event}`);
     }
-    // console.log(`New State | hungry: ${petState.hungry} | happy: ${petState.happy} | sleep: ${petState.sleepy}`);
-    const { topicName, partition } = await produceToPetStateChangesTopic(petId, petState);
-    return { 
-        petId: petId,
-        newPetState: petState,
-        topicName: topicName,
-        partition: partition
-    };
+    petInfo.petState = petState;
+    await produceToPetStateChangesTopic(petId, petInfo);
 };
 
 const onPetEventConsume = async (petId: string, message: string) => {
@@ -51,8 +45,7 @@ const onPetEventConsume = async (petId: string, message: string) => {
         console.log(`Unknown pet event: ${message}`);
         return;
     }
-    const result = await eventToNewPetState(petId, petInfo.petState, message);
-    console.log(result); // what 2 to with result?
+    await eventToNewPetState(petId, petInfo, message);
 };
 
 const startEventProcessor = async () => {

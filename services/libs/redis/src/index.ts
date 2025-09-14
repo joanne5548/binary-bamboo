@@ -1,5 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
-import { type PetInfo } from "@internal/interfaces/interfaces.js"
+import { type PetInfo } from "@internal/interfaces/interfaces.js";
 
 let client: RedisClientType | null = null;
 
@@ -14,7 +14,7 @@ const getClient = async () => {
     return client;
 };
 
-export const setNewPet = async (petId: string, petName: string) => {
+export const createNewPet = async (petId: string, petName: string) => {
     const redisClient = await getClient();
 
     await redisClient.set(`pet:name:${petName}`, petId);
@@ -24,15 +24,33 @@ export const setNewPet = async (petId: string, petName: string) => {
         petState: {
             hungry: 50,
             happy: 50,
-            sleepy: 50
-        }
+            sleepy: 50,
+        },
+    };
+    await redisClient.json.set(
+        `pet:id:${petId}`,
+        "$",
+        JSON.parse(JSON.stringify(defaultPetInfo)) // RedisJSON wouldn't accept PetInfo interface. :(
+    );
+};
+
+export const updatePetInfo = async (petId: string, newPetInfo: PetInfo) => {
+    const redisClient = await getClient();
+
+    const exists = await getPetInfo(petId);
+    if (!exists) {
+        throw new Error(`Redis: Pet ID does not exist`);
     }
-    await redisClient.json.set(`pet:id:${petId}`, "$", JSON.stringify(defaultPetInfo));
+    await redisClient.json.set(
+        `pet:id:${petId}`,
+        "$",
+        JSON.parse(JSON.stringify(newPetInfo))
+    );
 };
 
 /**
- * 
- * @param petName 
+ *
+ * @param petName
  * @returns Corresponding pet ID. Null if not
  */
 export const getPetId = async (petName: string) => {
@@ -48,11 +66,14 @@ export const getPetId = async (petName: string) => {
  */
 export const getPetInfo = async (petId: string) => {
     const redisClient = await getClient();
-    const petInfo = await redisClient.json.get(`pet:id:${petId}`, {
-        path: "$",
+    const result = await redisClient.json.get(`pet:id:${petId}`, {
+        path: ".",
     });
-    console.log(petInfo[0]);
-    return petInfo[0] as PetInfo; // TODO: use Zod for data validation
+
+    // TODO: use Zod for data validation
+    const petInfo: PetInfo =
+        typeof result === "string" ? JSON.parse(result) : result;
+    return petInfo;
 };
 
 // sanity check
