@@ -1,19 +1,39 @@
-from ui import main_ui, console
+from ui import update_main_ui
 import apis
+import json
+
+def createPet(pets, pet_counter):
+    name = input("Enter name of the new panda! ")
+    result = apis.postNewPet(name)
+
+    while result.status_code == 400:
+        name = input(f"Pet name {name} already exists. Enter a new name: ")
+        result = apis.postNewPet(name)
+    
+    if result.status_code == 201:
+        print(f"Pet {name} was created!")
+        petInfo = json.loads(result.text)
+        petInfo['state'] = {
+            'hungry': 50,
+            'happy': 50,
+            'sleepy': 50
+        }
+        pets[pet_counter] = petInfo
+        pet_counter += 1
+        print(pets)
+
 
 if __name__ == '__main__':
+    pets = {}
+    pet_counter = 1
     selection = 0
     while selection != 4:
-        console.print(main_ui)
+        console = update_main_ui(pets)
         selection = int(input("Enter menu selection: "))
-        print(f"You have selected: {selection}")
 
         match selection:
             case 1:
-                name = input("Enter name of the new panda! ")
-                result = apis.postNewPet(name)
-                # Returns name of the pet
-                print(f"Pet {name} was created! Response: {result}")
+                createPet(pets, pet_counter)
             case 2:
                 panda_number = input("Enter # of panda to be selected: ")
                 # Keep panda number as increasing integers from 1 as a dict = {number: panda_name}
