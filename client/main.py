@@ -3,30 +3,31 @@ import apis
 from ui import update_main_ui
 
 
-def createPet(pets, pet_counter):
+def createPet(pets, pet_counter, id_to_number):
     name = input("Enter name of the new panda! ")
-    result = apis.postNewPet(name)
+    res = apis.postNewPet(name)
 
-    while result.status_code == 400:
+    while res.status_code == 400:
         name = input(f"Pet name {name} already exists. Enter a new name: ")
-        result = apis.postNewPet(name)
+        res = apis.postNewPet(name)
     
-    if result.status_code == 201:
+    if res.status_code == 201:
         print(f"Pet {name} was created!")
-        petInfo = json.loads(result.text)
+        petInfo = json.loads(res.text)
         petInfo['state'] = {
             'hungry': 50,
             'happy': 50,
             'sleepy': 50
         }
-        pets[pet_counter] = petInfo
         pet_counter += 1
+        pets[pet_counter] = petInfo
+        id_to_number[petInfo['id']] = pet_counter
         print(pets)
 
 
-def handleNewEvent(pets):
+def handleNewEvent(pets, pet_counter):
     pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
-    while pet_number != "back" and pet_number.isdigit() and int(pet_number) not in pets:
+    while pet_number != "back" and pet_number.isdigit() and int(pet_number) <= pet_counter:
         print("Enter a valid input!")
         pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
     
@@ -57,7 +58,8 @@ def handleNewEvent(pets):
 
 if __name__ == '__main__':
     pets = {}
-    pet_counter = 1
+    id_to_number = {}
+    pet_counter = 0
     selection = 0
     while selection != 4:
         console = update_main_ui(pets)
@@ -65,9 +67,9 @@ if __name__ == '__main__':
 
         match selection:
             case 1:
-                createPet(pets, pet_counter)
+                createPet(pets, pet_counter, id_to_number)
             case 2:
-                handleNewEvent(pets)
+                handleNewEvent(pets, pet_counter)
             case 3:
                 choice = input("Are you sure you want to return all pandas to nature?\nEnter 1 for yes, 2 for no ")
             case 4:

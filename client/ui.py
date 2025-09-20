@@ -16,9 +16,9 @@ def update_dashboard(pets):
         name = pet_data['name']
         state = pet_data['state']
         header = f"\n:panda_face: #{pet_count}: {name}\n"
-        content = f"  {"hungry":^10}  {"happy":^10}  {"sleepy":^10}\n"
-        content += "  ——————————  ——————————  ——————————\n"
-        content += f"  {f"{state['hungry']}%":^10}  {f"{state['happy']}%":^10}  {f"{state['happy']}%":^10}\n"
+        content = f"   {"hungry":^10}  {"happy":^10}  {"sleepy":^10}\n"
+        content += "   ——————————  ——————————  ——————————\n"
+        content += f"   {f"{state['hungry']}%":^10}  {f"{state['happy']}%":^10}  {f"{state['happy']}%":^10}\n"
         dashboard_content += header + content
     dashboard_content = dashboard_content[1:-2]
     return Panel(dashboard_content, title="Dashboard", box=box.ROUNDED, width=75)

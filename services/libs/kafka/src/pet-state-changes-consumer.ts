@@ -13,7 +13,7 @@ const getConsumer = async () => {
         clientId: "pet-state-changes-consumer",
         brokers: ["localhost:29092", "localhost:39092", "localhost:49092"],
     });
-    consumer = client.consumer({ groupId: "state-changes-consumer" });
+    consumer = client.consumer({ groupId: "server-state-changes-consumer" });
     await consumer.connect();
     await consumer.subscribe({
         topic: "pet-state-changes",
