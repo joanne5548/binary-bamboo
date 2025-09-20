@@ -1,6 +1,7 @@
-from ui import update_main_ui
-import apis
 import json
+import apis
+from ui import update_main_ui
+
 
 def createPet(pets, pet_counter):
     name = input("Enter name of the new panda! ")
@@ -24,7 +25,20 @@ def createPet(pets, pet_counter):
 
 
 if __name__ == '__main__':
-    pets = {}
+    pets = {
+        # 0: {
+        #     'name': 'beep boop',
+        #     'state': {
+        #         'hungry': 50, 'happy': 50, 'sleepy': 50
+        #     }
+        # },
+        # 1: {
+        #     'name': 'yo yo ma',
+        #     'state': {
+        #         'hungry': 100, 'happy': 50, 'sleepy': 50
+        #     }
+        # },
+    }
     pet_counter = 1
     selection = 0
     while selection != 4:
