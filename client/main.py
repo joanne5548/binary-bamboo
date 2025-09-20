@@ -24,21 +24,39 @@ def createPet(pets, pet_counter):
         print(pets)
 
 
+def handleNewEvent(pets):
+    pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
+    while pet_number != "back" and pet_number.isdigit() and int(pet_number) not in pets:
+        print("Enter a valid input!")
+        pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
+    
+    if pet_number == "back":
+        return
+    pet_number = int(pet_number)
+
+    console.print("Enter...\n1 to Feed :bamboo:\n2 to Play :musical_note:\n3 to Sleep :bed:\n4 To Cancel")
+    action_choice = input("Input: ")
+    while not action_choice.isdigit() and 1 <= int(action_choice) <= 4:
+        action_choice = input("Input: ")
+    
+    action_choice = int(action_choice)
+    id = pets[pet_number]['id']
+    match action_choice:
+        case 1:
+            print("feed!!")
+            apis.postNewEvent(id, "feed")
+        case 2:
+            print("play!!")
+            apis.postNewEvent(id, "play")
+        case 3:
+            print("sleep!!")
+            apis.postNewEvent(id, "sleep")
+        case 4:
+            return
+
+
 if __name__ == '__main__':
-    pets = {
-        # 0: {
-        #     'name': 'beep boop',
-        #     'state': {
-        #         'hungry': 50, 'happy': 50, 'sleepy': 50
-        #     }
-        # },
-        # 1: {
-        #     'name': 'yo yo ma',
-        #     'state': {
-        #         'hungry': 100, 'happy': 50, 'sleepy': 50
-        #     }
-        # },
-    }
+    pets = {}
     pet_counter = 1
     selection = 0
     while selection != 4:
@@ -49,11 +67,7 @@ if __name__ == '__main__':
             case 1:
                 createPet(pets, pet_counter)
             case 2:
-                panda_number = input("Enter # of panda to be selected: ")
-                # Keep panda number as increasing integers from 1 as a dict = {number: panda_name}
-                print("")
-                console.print("Enter...\n1 to Feed :tanabata_tree:\n2 to Play :musical_note:\n3 to Sleep :bed:\n4 To Cancel")
-                action_choice = input("Input: ")
+                handleNewEvent(pets)
             case 3:
                 choice = input("Are you sure you want to return all pandas to nature?\nEnter 1 for yes, 2 for no ")
             case 4:

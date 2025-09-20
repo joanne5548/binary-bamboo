@@ -12,3 +12,12 @@ def postNewPet(name):
         return res
     except Exception as e:
         print(f"Client error: {e}")
+
+
+def postNewEvent(id, event):
+    try:
+        payload = {'event': event}
+        res = requests.post(f"{endpoint}/{id}", json=payload)
+        return res
+    except Exception as e:
+        print(f"Client error: {e}")

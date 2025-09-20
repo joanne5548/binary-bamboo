@@ -23,7 +23,7 @@ app.post("/", async (req: Request, res: Response) => {
 
         await createNewPet(id, name as string);
         
-        res.status(201).json({ name: name });
+        res.status(201).json({ id: id, name: name });
     } catch (error) {
         if (error instanceof Error) {
             console.error(`Server 1 error (API): ${error.message}`);

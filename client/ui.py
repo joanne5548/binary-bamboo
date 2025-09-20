@@ -4,7 +4,9 @@ from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
 
-def update_dashboard(console, pets):
+console = Console()
+
+def update_dashboard(pets):
     if not pets:
         dashboard_content = Align.center("No pandas...", vertical="middle")
         return Panel(dashboard_content, title="Dashboard", box=box.ROUNDED, width=75, height=6)
@@ -23,9 +25,8 @@ def update_dashboard(console, pets):
 
 
 def update_main_ui(pets):
-    console = Console()
     console.clear()
-    dashboard = update_dashboard(console, pets)
+    dashboard = update_dashboard(pets)
 
     menu_options = "1: Add a new panda\n2: Select a panda\n3: Let all panda return to nature\n4: Quit"
     menu = Panel(menu_options, title="Menu", box=box.ROUNDED, width=40, height=6)
