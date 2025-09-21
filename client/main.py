@@ -1,10 +1,17 @@
+import threading
+import queue
+import time
 import json
 import apis
+from consumer import kafka_consumer_thread
 from ui import update_main_ui
 
 
-def createPet(pets, pet_counter, id_to_number):
-    name = input("Enter name of the new panda! ")
+def createPet(pets, id_to_number):
+    name = input("Enter name of the new panda! (enter back to cancel) ")
+    if name == "back":
+        return
+
     res = apis.postNewPet(name)
 
     while res.status_code == 400:
@@ -19,15 +26,17 @@ def createPet(pets, pet_counter, id_to_number):
             'happy': 50,
             'sleepy': 50
         }
-        pet_counter += 1
-        pets[pet_counter] = petInfo
-        id_to_number[petInfo['id']] = pet_counter
+        curr_pet_count = len(id_to_number) + 1
+        pets[curr_pet_count] = petInfo
+        id_to_number[petInfo['id']] = curr_pet_count
+        print(f"ID to Number: {id_to_number}")
+        print(f"Current pet counter: {curr_pet_count}")
         print(pets)
 
 
-def handleNewEvent(pets, pet_counter):
+def handleNewEvent(console, pets, id_to_number):
     pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
-    while pet_number != "back" and pet_number.isdigit() and int(pet_number) <= pet_counter:
+    while pet_number != "back" and pet_number.isdigit() and not 0 < int(pet_number) <= len(id_to_number):
         print("Enter a valid input!")
         pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
     
@@ -56,22 +65,52 @@ def handleNewEvent(pets, pet_counter):
             return
 
 
-if __name__ == '__main__':
+def main():
     pets = {}
     id_to_number = {}
-    pet_counter = 0
     selection = 0
-    while selection != 4:
-        console = update_main_ui(pets)
-        selection = int(input("Enter menu selection: "))
 
-        match selection:
+    message_queue = queue.Queue()
+    stop_event = threading.Event()
+    
+    kafka_thread = threading.Thread(
+        target=kafka_consumer_thread,
+        args=(message_queue, stop_event)
+    )
+    kafka_thread.daemon = True
+    kafka_thread.start()
+
+    while True:
+        if not message_queue.empty():
+            while not message_queue.empty():
+                try:
+                    message_batch = message_queue.get_nowait()
+                    for message in message_batch:
+                        pet_number = id_to_number[message.key]
+                        pets[pet_number]['state'] = message.value['petState']
+                except message_queue.Empty:
+                    break
+        
+        console = update_main_ui(pets)
+
+        selection = input("Enter menu selection: ")
+        while not selection.isdigit() or not 1 <= int(selection) <= 4:
+            selection = input("Invalid input! Try again: ")
+        
+        match int(selection):
             case 1:
-                createPet(pets, pet_counter, id_to_number)
+                createPet(pets, id_to_number)
             case 2:
-                handleNewEvent(pets, pet_counter)
+                handleNewEvent(console, pets, id_to_number)
             case 3:
                 choice = input("Are you sure you want to return all pandas to nature?\nEnter 1 for yes, 2 for no ")
             case 4:
-                print("Bye Bye!")
+                console.clear()
+                print("Bye Bye! Shutting down...")
+                stop_event.set()
+                kafka_consumer_thread.join(timeout=2)
+                print("Cleanup complete")
                 exit()
+        time.sleep(0.01) # Give time for kafka to consume new messages
+
+main()

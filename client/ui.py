@@ -6,19 +6,22 @@ from rich.panel import Panel
 
 console = Console()
 
+
 def update_dashboard(pets):
     if not pets:
         dashboard_content = Align.center("No pandas...", vertical="middle")
-        return Panel(dashboard_content, title="Dashboard", box=box.ROUNDED, width=75, height=6)
+        return Panel(
+            dashboard_content, title="Dashboard", box=box.ROUNDED, width=75, height=6
+        )
 
     dashboard_content = ""
     for pet_count, pet_data in pets.items():
-        name = pet_data['name']
-        state = pet_data['state']
+        name = pet_data["name"]
+        state = pet_data["state"]
         header = f"\n:panda_face: #{pet_count}: {name}\n"
         content = f"   {"hungry":^10}  {"happy":^10}  {"sleepy":^10}\n"
         content += "   ——————————  ——————————  ——————————\n"
-        content += f"   {f"{state['hungry']}%":^10}  {f"{state['happy']}%":^10}  {f"{state['happy']}%":^10}\n"
+        content += f"   {f"{state['hungry']}%":^10}  {f"{state['happy']}%":^10}  {f"{state['sleepy']}%":^10}\n"
         dashboard_content += header + content
     dashboard_content = dashboard_content[1:-2]
     return Panel(dashboard_content, title="Dashboard", box=box.ROUNDED, width=75)
@@ -26,6 +29,7 @@ def update_dashboard(pets):
 
 def update_main_ui(pets):
     console.clear()
+    console.print("\n")
     dashboard = update_dashboard(pets)
 
     menu_options = "1: Add a new panda\n2: Select a panda\n3: Let all panda return to nature\n4: Quit"
