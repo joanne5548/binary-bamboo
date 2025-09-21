@@ -29,7 +29,7 @@ export const runPetStateChangesConsumer = async (
     await kafkaConsumer.run({
         eachMessage: async ({ message }) => {
             const petId = message.key.toString();
-            // parse message.value since the JSON is serialized
+            // parse message.value since the message value JSON is serialized
             const newPetInfo: PetInfo = JSON.parse(message.value.toString()); // Zod data validation for message value?
             messageCallback(petId, newPetInfo);
         }

@@ -21,3 +21,11 @@ def postNewEvent(id, event):
         return res
     except Exception as e:
         print(f"Client error: {e}")
+
+    
+def getAllPetData():
+    try:
+        res = requests.get(endpoint)
+        return res
+    except Exception as e:
+        print(f"Client error: {e}")

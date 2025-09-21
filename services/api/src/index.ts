@@ -2,7 +2,7 @@ import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
-import { createNewPet, getPetId, getPetInfo } from "@internal/redis";
+import { createNewPet, getAllPetInfo, getPetId, getPetInfo } from "@internal/redis";
 import { produceToPetEventsTopic } from "@internal/kafka";
 
 dotenv.config();
@@ -66,7 +66,19 @@ app.post("/:id", async (req: Request, res: Response) => {
 });
 
 app.get("/", async (req: Request, res: Response) => {
-    res.status(200).send("da server is up and running :D");
+    try {
+        const data = await getAllPetInfo();
+        res.status(200).json({ data: data });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error("Server error:", error.message);
+            res.status(500).json({ error: "Server error: " + error.message });
+        } else {
+            console.error("Unexpected error:", error);
+            res.status(500).json({ error: "Unexpected error occured" });
+        }
+    }
 });
 
 const domain = process.env.SERVER_DOMAIN;

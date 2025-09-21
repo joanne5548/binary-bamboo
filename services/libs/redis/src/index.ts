@@ -48,6 +48,33 @@ export const updatePetInfo = async (petId: string, newPetInfo: PetInfo) => {
     );
 };
 
+export const getAllPetInfo = async () => {
+    const redisClient = await getClient();
+    let cursor = '0';
+    let data: { [key: string]: PetInfo } = {};
+    do {
+        const result = await redisClient.scan(cursor, {
+            MATCH: 'pet:id:*'
+        });
+        cursor = result.cursor;
+        const keys = result.keys;
+
+        if (keys.length > 0) {
+            const values = await redisClient.json.mGet(keys, '$');
+            keys.forEach((key: string, index: number) => {
+                if (key.length !== 43) {
+                    throw Error(`Key retrieved from Redis is in incorrect format. Key: ${key}`);
+                }
+
+                const value = values[index][0];
+                const petInfo: PetInfo = typeof value === 'string' ? JSON.parse(value) : value;
+                data[key.substring(7)] = petInfo;
+            });
+        }
+    } while (cursor !== '0')
+    return data;
+}
+
 /**
  *
  * @param petName

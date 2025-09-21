@@ -26,7 +26,7 @@ def createPet(pets, id_to_number):
             'happy': 50,
             'sleepy': 50
         }
-        curr_pet_count = len(id_to_number) + 1
+        curr_pet_count = len(pets) + 1
         pets[curr_pet_count] = petInfo
         id_to_number[petInfo['id']] = curr_pet_count
         print(f"ID to Number: {id_to_number}")
@@ -65,10 +65,34 @@ def handleNewEvent(console, pets, id_to_number):
             return
 
 
+def processPetData():
+    res = apis.getAllPetData()
+    data = json.loads(res.text)
+    if 'data' not in data:
+        raise Exception('Invalid data received from get request.')
+    elif not data:
+        return {}, {}
+    
+    data = data['data']
+
+    pets, id_to_number = {}, {}
+    for pet_id, pet_data in data.items():
+        pet_number = len(pets) + 1
+        pets[pet_number] = {
+            'id': pet_id,
+            'name': pet_data['petName'],
+            'state': pet_data['petState']
+        }
+        id_to_number[pet_id] = pet_number
+    return pets, id_to_number
+
+
 def main():
-    pets = {}
-    id_to_number = {}
-    selection = 0
+    try:
+        pets, id_to_number = processPetData()
+    except Exception as e:
+        print(f"Client error: {e}. Proceed with empty data")
+        pets, id_to_number = {}, {}
 
     message_queue = queue.Queue()
     stop_event = threading.Event()
