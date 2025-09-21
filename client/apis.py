@@ -22,10 +22,18 @@ def postNewEvent(id, event):
     except Exception as e:
         print(f"Client error: {e}")
 
-    
+
 def getAllPetData():
     try:
         res = requests.get(endpoint)
         return res
+    except Exception as e:
+        print(f"Client error: {e}")
+
+
+def deleteAllPetData():
+    try:
+        res = requests.delete(endpoint)
+        return res # Check based on status code?
     except Exception as e:
         print(f"Client error: {e}")

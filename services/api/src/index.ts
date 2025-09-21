@@ -2,7 +2,7 @@ import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
-import { createNewPet, getAllPetInfo, getPetId, getPetInfo } from "@internal/redis";
+import { createNewPet, deleteAllPets, getAllPetInfo, getPetId, getPetInfo } from "@internal/redis";
 import { produceToPetEventsTopic } from "@internal/kafka";
 
 dotenv.config();
@@ -80,6 +80,26 @@ app.get("/", async (req: Request, res: Response) => {
         }
     }
 });
+
+app.delete("/", async (req: Request, res: Response) => {
+    try {
+        const result = await deleteAllPets();
+        console.log(`Deleted: ${result}`)
+        if (result !== "OK") {
+            throw new Error("Pet record deletion unsuccessful.");
+        }
+        res.status(200).json({ status: "Success" });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error("Server error:", error.message);
+            res.status(500).json({ error: "Server error: " + error.message });
+        } else {
+            console.error("Unexpected error:", error);
+            res.status(500).json({ error: "Unexpected error occured" });
+        }
+    }
+})
 
 const domain = process.env.SERVER_DOMAIN;
 const port = process.env.PORT || 8080;

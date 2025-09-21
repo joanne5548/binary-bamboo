@@ -103,5 +103,11 @@ export const getPetInfo = async (petId: string) => {
     return petInfo;
 };
 
+export const deleteAllPets = async () => {
+    const redisClient = await getClient();
+    const result = await redisClient.flushAll();
+    return result;
+}
+
 // sanity check
 console.log("Redis module compiled!");

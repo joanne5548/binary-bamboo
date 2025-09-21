@@ -7,6 +7,29 @@ from consumer import kafka_consumer_thread
 from ui import update_main_ui
 
 
+def processPetData():
+    res = apis.getAllPetData()
+    data = json.loads(res.text)
+    if 'data' not in data:
+        print('Invalid data received from get request. Proceed with empty data')
+        return {}, {}
+    elif not data:
+        return {}, {}
+    
+    data = data['data']
+
+    pets, id_to_number = {}, {}
+    for pet_id, pet_data in data.items():
+        pet_number = len(pets) + 1
+        pets[pet_number] = {
+            'id': pet_id,
+            'name': pet_data['petName'],
+            'state': pet_data['petState']
+        }
+        id_to_number[pet_id] = pet_number
+    return pets, id_to_number
+
+
 def createPet(pets, id_to_number):
     name = input("Enter name of the new panda! (enter back to cancel) ")
     if name == "back":
@@ -36,9 +59,8 @@ def createPet(pets, id_to_number):
 
 def handleNewEvent(console, pets, id_to_number):
     pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
-    while pet_number != "back" and pet_number.isdigit() and not 0 < int(pet_number) <= len(id_to_number):
-        print("Enter a valid input!")
-        pet_number = input("Enter # of panda to be selected (enter back to cancel): ")
+    while not (pet_number == "back" or pet_number.isdigit() and 0 < int(pet_number) <= len(id_to_number)):
+        pet_number = input("Invalid input! Try again (enter back to cancel): ")
     
     if pet_number == "back":
         return
@@ -46,8 +68,8 @@ def handleNewEvent(console, pets, id_to_number):
 
     console.print("Enter...\n1 to Feed :bamboo:\n2 to Play :musical_note:\n3 to Sleep :bed:\n4 To Cancel")
     action_choice = input("Input: ")
-    while not action_choice.isdigit() and 1 <= int(action_choice) <= 4:
-        action_choice = input("Input: ")
+    while not (action_choice.isdigit() and 1 <= int(action_choice) <= 4):
+        action_choice = input("Invalid input! Try again: ")
     
     action_choice = int(action_choice)
     id = pets[pet_number]['id']
@@ -63,36 +85,21 @@ def handleNewEvent(console, pets, id_to_number):
             apis.postNewEvent(id, "sleep")
         case 4:
             return
+        
 
+def handlePetDataDeletion(pets, id_to_number):
+    choice = input("Are you sure you want to return all pandas to nature?\nEnter 1 for yes, 2 for no: ")
+    while not choice.isdigit() or (int(choice) != 1 and int(choice) != 2):
+        choice = input("Invalid input. Please enter 1 for yes, 2 for no: ")
 
-def processPetData():
-    res = apis.getAllPetData()
-    data = json.loads(res.text)
-    if 'data' not in data:
-        raise Exception('Invalid data received from get request.')
-    elif not data:
-        return {}, {}
-    
-    data = data['data']
-
-    pets, id_to_number = {}, {}
-    for pet_id, pet_data in data.items():
-        pet_number = len(pets) + 1
-        pets[pet_number] = {
-            'id': pet_id,
-            'name': pet_data['petName'],
-            'state': pet_data['petState']
-        }
-        id_to_number[pet_id] = pet_number
-    return pets, id_to_number
+    if int(choice) == 1:
+        apis.deleteAllPetData()
+        pets.clear()
+        id_to_number.clear()
 
 
 def main():
-    try:
-        pets, id_to_number = processPetData()
-    except Exception as e:
-        print(f"Client error: {e}. Proceed with empty data")
-        pets, id_to_number = {}, {}
+    pets, id_to_number = processPetData()
 
     message_queue = queue.Queue()
     stop_event = threading.Event()
@@ -127,7 +134,7 @@ def main():
             case 2:
                 handleNewEvent(console, pets, id_to_number)
             case 3:
-                choice = input("Are you sure you want to return all pandas to nature?\nEnter 1 for yes, 2 for no ")
+                handlePetDataDeletion(pets, id_to_number)
             case 4:
                 console.clear()
                 print("Bye Bye! Shutting down...")
