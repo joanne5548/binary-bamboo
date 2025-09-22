@@ -20,6 +20,10 @@
 ** Check out Architecture.md for more information on how each services communicate to each other
 
 
+## Architecture
+Event-driven microservices with real-time state synchronization. See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design decisions and data flow.
+
+
 ## Installation
 Frist, clone the repo:
 ```
@@ -67,14 +71,7 @@ npm run dev
 1. `/client`
     - Contains Terminal UI application
 2. `/services`
-    - Contains 3 servers and dependency directory
-    - `/api`: API Gateway
-    - `/event-processor`: Event processor; logic for event -> state
-    - `/db-writer`: Database writer to Redis
-    - `/libs`: Dependencies
-        1. `/interfaces`: Contains interfaces
-        2. `/kafka`: Contains Kafka operations
-        3. `/redis`: Contains Redis operations
+    - Contains 3 backend services and a dependency (libs) directory
 
 
 ## Environment Variables
