@@ -37,6 +37,7 @@ Set up a virtual environment using either:
 ```bash
 cd client
 conda env create -f environment.yml
+conda activate bamboo
 ```
 
 2. Pip
