@@ -65,6 +65,7 @@ process.on("SIGINT", async () => {
     // Todo: Test these
     await shutdownProducer();
     await shutdownPetEventsConsumer();
+    console.log("Server 2 shutdown complete.")
     process.exit(0);
 });
 

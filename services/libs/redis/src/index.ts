@@ -108,6 +108,3 @@ export const deleteAllPets = async () => {
     const result = await redisClient.flushAll();
     return result;
 }
-
-// sanity check
-console.log("Redis module compiled!");

@@ -1,4 +1,4 @@
-import { runPetStateChangesConsumer } from "@internal/kafka"
+import { runPetStateChangesConsumer, shutdownPetStateChangesConsumer } from "@internal/kafka"
 import { updatePetInfo } from "@internal/redis"
 import { type PetInfo } from "@internal/interfaces/interfaces.js"
 
@@ -21,8 +21,10 @@ const runDBWriter = async () => {
 }
 
 process.on("SIGINT", async () => {
-    console.log("Shutting down DB Writer server...");
-    // shut down logic
+    console.log("Shutting down server 3...");
+    await shutdownPetStateChangesConsumer();
+    console.log("Server 3 shutdown complete.")
+    process.exit(0);
 });
 
 runDBWriter();

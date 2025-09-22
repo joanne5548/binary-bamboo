@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-endpoint = f"http://{os.getenv("SERVER_DOMAIN")}:{os.getenv("PORT")}"
+endpoint = f"http://{os.getenv("SERVER_DOMAIN", "localhost")}:{os.getenv("PORT", "8080")}"
 
 def postNewPet(name):
     try:

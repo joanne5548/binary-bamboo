@@ -1,0 +1,18 @@
+brotlicffi @ file:///croot/brotlicffi_1736182461069/work
+certifi @ file:///croot/certifi_1754570635119/work/certifi
+cffi @ file:///croot/cffi_1736182485317/work
+charset-normalizer @ file:///croot/charset-normalizer_1721748349566/work
+idna @ file:///work/perseverance-python-buildout/croot/idna_1728385935861/work
+kafka-python @ file:///home/conda/feedstock_root/build_artifacts/kafka-python_1751459906350/work
+markdown-it-py @ file:///croot/markdown-it-py_1756299186942/work
+mdurl @ file:///work/perseverance-python-buildout/croot/mdurl_1728387286143/work
+pycparser @ file:///home/task_175749564936714/conda-bld/pycparser_1757496040682/work
+Pygments @ file:///croot/pygments_1744664109463/work
+PySocks @ file:///work/perseverance-python-buildout/croot/pysocks_1728386193338/work
+python-dotenv @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_python-dotenv_1750789290/work
+requests @ file:///croot/requests_1756709366904/work
+rich @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_rich_1753436991/work/dist
+setuptools==78.1.1
+typing_extensions @ file:///croot/typing_extensions_1756280817316/work
+urllib3 @ file:///croot/urllib3_1750775463400/work
+wheel==0.45.1
