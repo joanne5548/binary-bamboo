@@ -62,10 +62,9 @@ const startEventProcessor = async () => {
 
 process.on("SIGINT", async () => {
     console.log("Shutting down server 2...");
-    // Todo: Test these
     await shutdownProducer();
     await shutdownPetEventsConsumer();
-    console.log("Server 2 shutdown complete.")
+    console.log("Server 2 shutdown complete.");
     process.exit(0);
 });
 

@@ -41,9 +41,9 @@ cd client
 pip install -r requirements.txt
 ```
 
-And run the CLI.
+And run the CLI:
 ```bash
-python main.py
+python src/main.py
 ```
 
 ### Server
@@ -68,9 +68,9 @@ npm run dev
     - Contains Terminal UI application
 2. `/services`
     - Contains 3 servers and dependency directory
-    1. `/api`: API Gateway
-    2. `/event-processor`: Event processor; logic for event -> state
-    3. `/db-writer`: Database writer to Redis
+    - `/api`: API Gateway
+    - `/event-processor`: Event processor; logic for event -> state
+    - `/db-writer`: Database writer to Redis
     - `/libs`: Dependencies
         1. `/interfaces`: Contains interfaces
         2. `/kafka`: Contains Kafka operations
@@ -93,9 +93,9 @@ Placed in `/server/api` directory.
 
 ## Todo
 - [ ] Create `Architecture.md`
-- [ ] Adjust UI width
-- [ ] Refactor client folder structure - create src directory
-- [ ] Fully test shutdown logic for Kafka
+- [x] Adjust UI width
+- [x] Refactor client folder structure - create src directory
+- [x] Fully test shutdown logic for Kafka
 
 
 ## Contact

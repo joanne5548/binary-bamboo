@@ -11,7 +11,7 @@ def update_dashboard(pets):
     if not pets:
         dashboard_content = Align.center("No pandas...", vertical="middle")
         return Panel(
-            dashboard_content, title="Dashboard", box=box.ROUNDED, width=75, height=6
+            dashboard_content, title="Dashboard", box=box.ROUNDED, width=50, height=6
         )
 
     dashboard_content = ""
@@ -24,7 +24,7 @@ def update_dashboard(pets):
         content += f"   {f"{state['hungry']}%":^10}  {f"{state['happy']}%":^10}  {f"{state['sleepy']}%":^10}\n"
         dashboard_content += header + content
     dashboard_content = dashboard_content[1:-2]
-    return Panel(dashboard_content, title="Dashboard", box=box.ROUNDED, width=75)
+    return Panel(Align.center(dashboard_content), title="Dashboard", box=box.ROUNDED, width=50)
 
 
 def update_main_ui(pets):
@@ -44,7 +44,7 @@ def update_main_ui(pets):
         title=welcome_message,
         box=box.ROUNDED,
         border_style="chartreuse2",
-        width=120,
+        width=105,
     )
     console.print(main_ui)
     return console
