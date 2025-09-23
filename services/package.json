@@ -6,15 +6,22 @@
   "author": "",
   "type": "commonjs",
   "main": "index.js",
+  "private": "true",
+  "workspaces": [
+    "api",
+    "event-processor",
+    "db-writer",
+    "libs/*"
+  ],
   "scripts": {
     "dev": "run-s build:libs start:services",
     "build:libs": "run-p build:lib:*",
-    "build:lib:kafka": "cd libs/kafka && tsc",
-    "build:lib:redis": "cd libs/redis && tsc",
+    "build:lib:kafka": "npm run build -w libs/kafka",
+    "build:lib:redis": "npm run build -w libs/redis",
     "start:services": "run-p start:service:*",
-    "start:service:api": "cd api && npm run dev",
-    "start:service:event": "cd event-processor && npm run dev",
-    "start:service:db": "cd db-writer && npm run dev"
+    "start:service:api": "npm run dev -w api",
+    "start:service:event": "npm run dev -w event-processor",
+    "start:service:db": "npm run dev -w db-writer"
   },
   "dependencies": {
     "npm-run-all": "^4.1.5"

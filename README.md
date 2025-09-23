@@ -17,7 +17,12 @@
 - Kafka (Message streams)
 - Redis (Cache database)
 
-** Check out Architecture.md for more information on how each services communicate to each other
+
+## Directory Structure
+1. `/client`
+    - Contains Terminal UI application
+2. `/services`
+    - Contains 3 backend services and a dependency (libs) directory
 
 
 ## Architecture
@@ -30,7 +35,25 @@ Frist, clone the repo:
 git clone https://github.com/joanne5548/binary-bamboo.git
 ```
 
+
+### Server
+Prerequisite: Docker Desktop is installed and running.
+
+First, run Docker container:
+```bash
+cd services
+docker compose up -d
+```
+
+And install dependencies & run microservices:
+```bash
+npm i && npm run dev
+```
+> [!Note] Servers might not connect to Kafka on first try. If error message "This server does not host this topic-partition" is observed, terminate current process, and re-try the above command.
+
+
 ### Client
+Go back to root directory.
 Set up a virtual environment using either:
 
 1. Conda (Recommended)
@@ -43,6 +66,7 @@ conda activate bamboo
 2. Pip
 ```bash
 cd client
+# Activate virtual environment
 pip install -r requirements.txt
 ```
 
@@ -50,29 +74,6 @@ And run the CLI:
 ```bash
 python src/main.py
 ```
-
-### Server
-Prerequisite: Docker Desktop is installed and running.
-
-First, run Docker container:
-```bash
-cd server
-docker compose up -d
-```
-
-And run microservices:
-```bash
-cd server
-npm run dev
-```
-> [!Note] Servers might not connect to Kafka on first try. If error message "this server does not host this topic" is observed, terminate current process, and re-try the above command.
-
-
-## Directory Structure
-1. `/client`
-    - Contains Terminal UI application
-2. `/services`
-    - Contains 3 backend services and a dependency (libs) directory
 
 
 ## Environment Variables
@@ -87,13 +88,6 @@ Placed in `/client` directory.
 Placed in `/server/api` directory.
 1. `SERVER_DOMAIN`: Server domain. Default: localhost
 2. `PORT`: Port # to send API requests. Default: 8080
-
-
-## Todo
-- [ ] Create `Architecture.md`
-- [x] Adjust UI width
-- [x] Refactor client folder structure - create src directory
-- [x] Fully test shutdown logic for Kafka
 
 
 ## Contact
