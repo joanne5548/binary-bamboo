@@ -100,7 +100,7 @@ app.delete("/", async (req: Request, res: Response) => {
     }
 })
 
-const domain = process.env.SERVER_DOMAIN;
+const domain = process.env.SERVER_DOMAIN || "localhost";
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`[server]: API Server is running at http://${domain}:${port}`);
