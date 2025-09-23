@@ -28,6 +28,10 @@ export const runPetStateChangesConsumer = async (
     const kafkaConsumer = await getConsumer();
     await kafkaConsumer.run({
         eachMessage: async ({ message }) => {
+            if (message.key === null || message.value === null) {
+                throw new Error(`Kafka: Message key or value is null. Key: ${message.key}, Value: ${message.value}`);
+            }
+            
             const petId = message.key.toString();
             // parse message.value since the message value JSON is serialized
             const newPetInfo: PetInfo = JSON.parse(message.value.toString()); // Zod data validation for message value?

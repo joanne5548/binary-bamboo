@@ -10,7 +10,6 @@ const getClient = async () => {
 
     client = createClient();
     await client.connect();
-    console.log("Redis client connected.");
     return client;
 };
 
@@ -63,7 +62,10 @@ export const getAllPetInfo = async () => {
             const values = await redisClient.json.mGet(keys, '$');
             keys.forEach((key: string, index: number) => {
                 if (key.length !== 43) {
-                    throw Error(`Key retrieved from Redis is in incorrect format. Key: ${key}`);
+                    throw new Error(`Key retrieved from Redis is in incorrect format. Key: ${key}`);
+                }
+                else if (values[index] == null || !Array.isArray(values[index]) || values[index][0] == null) {
+                    throw new Error(`Redis: Invalid value retrieved from key. Key: ${key}, Value: ${values[index]}`)
                 }
 
                 const value = values[index][0];

@@ -84,7 +84,6 @@ app.get("/", async (req: Request, res: Response) => {
 app.delete("/", async (req: Request, res: Response) => {
     try {
         const result = await deleteAllPets();
-        console.log(`Deleted: ${result}`)
         if (result !== "OK") {
             throw new Error("Pet record deletion unsuccessful.");
         }

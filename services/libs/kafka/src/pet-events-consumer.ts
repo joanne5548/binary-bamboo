@@ -21,7 +21,12 @@ const getConsumer = async () => {
 export const runPetEventsConsumer = async (messageCallback: (petId: string, message: string) => Promise<void>) => {
     const kafkaConsumer = await getConsumer();
     await kafkaConsumer.run({
-        eachMessage: async ({ message }) => messageCallback(message.key.toString(), message.value.toString())
+        eachMessage: async ({ message }) => {
+            if (message.key == null || message.value == null) {
+                throw new Error(`Kafka: Message key or value is null/undefined. Key: ${message.key}, Value: ${message.value}`);
+            }
+            messageCallback(message.key.toString(), message.value.toString());
+        }
     });
 }
 

@@ -11,19 +11,16 @@ const eventToNewPetState = async (petId: string, petInfo: PetInfo, event: string
     let petState = petInfo.petState;
     switch (event) {
         case "feed":
-            console.log("you fed your pet!");
             petState.hungry = petState.hungry > 15 ? petState.hungry - 15 : 0;
             petState.happy = petState.happy < 90 ? petState.happy + 10 : 100;
             petState.sleepy = petState.sleepy < 95 ? petState.sleepy + 5 : 100;
             break;
         case "play":
-            console.log("you played with your pet!");
             petState.hungry = petState.hungry < 80 ? petState.hungry + 20 : 100;
             petState.happy = petState.happy < 80 ? petState.happy + 20 : 100;
             petState.sleepy = petState.sleepy < 85 ? petState.sleepy + 15 : 100;
             break;
         case "sleep":
-            console.log("your pet took a nap!");
             petState.hungry = petState.hungry < 70 ? petState.hungry + 30 : 100;
             petState.happy = petState.happy > 10 ? petState.happy - 10 : 0;
             petState.sleepy = petState.sleepy > 30 ? petState.sleepy - 30 : 0;

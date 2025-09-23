@@ -18,7 +18,6 @@ const getProducer = async () => {
 
     producer = client.producer();
     await producer.connect();
-    console.log("Pet Events Producer connected!");
     return producer;
 };
 
